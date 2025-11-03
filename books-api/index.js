@@ -68,6 +68,24 @@ async function getOneBookTitle(index) {
   return parsedBooks[index].title;
 }
 
+async function updateOneBookTitle(index, newBookTitle) {
+  //read from the file to get the books data
+  const data = await fs.readFile("./books-data.json", "utf8");
+  // parse the books data from json to js
+  const parsedBooks = JSON.parse(data);
+  // find the book and update its title
+  const bookToUpdate = parsedBooks[index];
+  // console.log(bookToUpdate);
+  //to update the title we would first get the book
+  parsedBooks[index].title = newBookTitle;
+  console.log(bookToUpdate);
+  //stringify books data back into json-
+  const stringifyBooks = JSON.stringify(parsedBooks);
+
+  // write the new data to the file
+  fs.writeFile("./books-data.json", stringifyBooks, "utf8");
+}
+
 // ---------------------------------
 // API Endpoints
 // ---------------------------------
@@ -113,4 +131,16 @@ app.get("/get-one-book-title/:index", async (req, res) => {
   // Alternative 2: send the response as a valid JSON object
   // This is the preferred way, because most APIs these days are sending data in JSON format
   res.json({ title: bookTitle });
+});
+
+// POST /update-one-book-title/:index/:newBookTitle
+app.post("/update-one-book-title/:index/:newBookTitle", async (req, res) => {
+  const index = req.params.index;
+  const newBookTitle = req.params.newBookTitle;
+  // // call the helper function
+  await updateOneBookTitle(index, newBookTitle);
+  res.send(
+    `book title at index ${index} successfully updated to 
+      ${newBookTitle}!`
+  );
 });
